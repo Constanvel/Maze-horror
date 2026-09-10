@@ -14,34 +14,43 @@ i { display: inline-block; width: 5px; height: 5px; background: #929b75; margin-
 .crt { position: absolute; inset: 0; pointer-events: none; z-index: 3; opacity: .22; background: repeating-linear-gradient(0deg, #0006 0 1px, transparent 1px 3px); box-shadow: inset 0 0 120px #000a; }
 .screen { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: linear-gradient(90deg, #07090895, #07090845, #07090895); z-index: 4; }
 .screen-inner { padding: 24px; }
-.eyebrow { color: #a5ab90; font-size: 9px; letter-spacing: 3px; margin: 0 0 22px; }
-h1 { margin: 0; color: #deddd0; font-family: Impact, "Arial Narrow", sans-serif; font-size: clamp(48px, 8vw, 110px); line-height: .9; font-weight: 900; letter-spacing: 5px; text-shadow: 3px 0 #979b802d, -2px 1px #9f27272b, 0 5px 28px #000; }
-.title-dot { color: #a94035; }
-.tagline { margin: 25px 0 0; font-size: 13px; color: #c3c4b5; }
-.objective { font-size: 9px; letter-spacing: 2px; color: #878c76; margin: 13px 0 29px; }
-#start { min-width: 220px; border: 1px solid #af4236; padding: 17px 22px; background: #8c3028; color: #efe7da; font-size: 12px; letter-spacing: 2px; text-align: left; box-shadow: 0 5px 30px #0006; }
+.eyebrow { color: #5a5f50; font-size: 8px; letter-spacing: 3px; margin: 0 0 18px; }
+h1 { margin: 0; color: #cac9bc; font-family: Impact, "Arial Narrow", sans-serif; font-size: clamp(52px, 9vw, 120px); line-height: .88; font-weight: 900; letter-spacing: 4px; text-shadow: 0 4px 32px #000; }
+.title-dot { color: #8c3028; }
+.tagline { margin: 20px 0 0; font-size: 11px; color: #7a7b6e; letter-spacing: 1px; }
+.objective { font-size: 8px; letter-spacing: 2px; color: #555850; margin: 10px 0 26px; }
+#start { min-width: 180px; border: 1px solid #6b2820; padding: 15px 20px; background: #5a1e18; color: #c8c0b5; font-size: 11px; letter-spacing: 2px; text-align: left; box-shadow: 0 4px 24px #0008; }
 #start span { float: right; }
-#start:hover { background: #a33b30; }
-.screen-note { font-size: 8px; letter-spacing: 1.3px; color: #7c8170; margin-top: 18px; }
+#start:hover { background: #7a2820; }
+.screen-note { font-size: 7px; letter-spacing: 1.5px; color: #464840; margin-top: 14px; }
 .corner { position: absolute; width: 20px; height: 20px; opacity: .6; border-color: #a4aa8c; border-style: solid; }
 .top-left { top: 23px; left: 23px; border-width: 1px 0 0 1px; }
 .bottom-right { bottom: 23px; right: 23px; border-width: 0 1px 1px 0; }
 .recording { position: absolute; bottom: 26px; left: 26px; font-size: 9px; letter-spacing: 2px; color: #969b85; }
 .recording i { background: #a74638; width: 4px; height: 4px; }
 /* ── HUD ────────────────────────────────────────────────────────────────── */
-.hud { position: absolute; inset: 0; padding: 20px 28px; pointer-events: none; font-size: 12px; letter-spacing: 1.5px; text-shadow: 0 2px 4px #000, 0 0 8px #0008; z-index: 5; }
-.hud-top, .hud-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.hud-top { position: absolute; left: 28px; right: 28px; top: 20px; }
-.hud-bottom { position: absolute; left: 28px; right: 28px; bottom: 20px; }
-#exit-status { color: #bb7261; }
-#exit-status.unlocked { color: #b8c99b; }
-.crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #dcdac099; font-size: 16px; }
+.hud { position: absolute; inset: 0; padding: 20px 24px; pointer-events: none; z-index: 5; }
+.hud-top, .hud-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.hud-top { position: absolute; left: 24px; right: 24px; top: 18px; }
+.hud-bottom { position: absolute; left: 24px; right: 24px; bottom: 18px; }
+/* Timer countdown — tiny, top-left; turns red + pulses last 10s */
+.hud-keys { font-size: 11px; letter-spacing: 2px; color: #8a8870; opacity: 0.75; text-shadow: 0 1px 4px #000; font-family: monospace; }
+.hud-keys.timer-danger { color: #cc2222; opacity: 1; animation: timerPulse 0.6s ease-in-out infinite; }
+/* Exit label — only appears when unlocked, green */
+.hud-exit { font-size: 9px; letter-spacing: 2px; color: #7ea870; text-shadow: 0 1px 6px #000; }
+/* Battery — monospace block chars, very dim */
+.hud-battery { font-size: 9px; letter-spacing: 1px; color: #666; opacity: 0.6; font-family: monospace; text-shadow: none; }
+/* No-light warning */
+.hud-light { font-size: 8px; letter-spacing: 2px; color: #7a4040; opacity: 0.8; }
+#exit-status { color: #7ea870; }
+.crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffffff18; font-size: 14px; }
 /* ── MESSAGE ────────────────────────────────────────────────────────────── */
-.message { position: absolute; bottom: 13%; left: 12px; right: 12px; text-align: center; z-index: 6; color: #d6cfbb; font-size: 13px; letter-spacing: 2.5px; text-shadow: 0 2px 8px #000, 0 0 20px #0009; opacity: 0; transition: opacity .35s; pointer-events: none; }
+.message { position: absolute; bottom: 11%; left: 10%; right: 10%; text-align: center; z-index: 6; color: #a09888; font-size: 10px; letter-spacing: 3px; text-shadow: 0 1px 6px #000; opacity: 0; transition: opacity .5s; pointer-events: none; }
 .message.visible { opacity: 1; }
 /* ── MONSTER PROXIMITY EFFECTS ──────────────────────────────────────────── */
 .danger::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; box-shadow: inset 0 0 120px #8b161cbb; animation: pulseRed 1.4s ease-in-out infinite; }
 .imminent::after { animation: pulseRed .4s ease-in-out infinite !important; }
+@keyframes timerPulse { 0%,100% { opacity:1; text-shadow:0 0 8px #cc2222; } 50% { opacity:0.5; text-shadow:0 0 20px #ff0000; } }
 @keyframes pulseRed { 0%,100% { opacity:.7; box-shadow:inset 0 0 120px #8b161cbb; } 50% { opacity:1; box-shadow:inset 0 0 220px #c01020ee; } }
 /* ── SHAKE / FLICKER ────────────────────────────────────────────────────── */
 .shake canvas { animation: shake .1s infinite; }
