@@ -1,0 +1,80 @@
+:root { color-scheme: dark; font-family: "Courier New", monospace; color: #cccbbf; background: #000; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 2px solid #e6dfbf; outline-offset: 5px; }
+/* ── FULL-SCREEN GAME ───────────────────────────────────────────────────── */
+#game { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.wordmark { color: #dddcd0; text-decoration: none; font-weight: bold; font-size: 14px; }
+.wordmark span { color: #777a6d; font-size: 10px; font-weight: normal; }
+.signal { color: #939c7e; font-size: 10px; }
+i { display: inline-block; width: 5px; height: 5px; background: #929b75; margin-right: 7px; }
+.crt { position: absolute; inset: 0; pointer-events: none; z-index: 3; opacity: .22; background: repeating-linear-gradient(0deg, #0006 0 1px, transparent 1px 3px); box-shadow: inset 0 0 120px #000a; }
+.screen { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: linear-gradient(90deg, #07090895, #07090845, #07090895); z-index: 4; }
+.screen-inner { padding: 24px; }
+.eyebrow { color: #a5ab90; font-size: 9px; letter-spacing: 3px; margin: 0 0 22px; }
+h1 { margin: 0; color: #deddd0; font-family: Impact, "Arial Narrow", sans-serif; font-size: clamp(48px, 8vw, 110px); line-height: .9; font-weight: 900; letter-spacing: 5px; text-shadow: 3px 0 #979b802d, -2px 1px #9f27272b, 0 5px 28px #000; }
+.title-dot { color: #a94035; }
+.tagline { margin: 25px 0 0; font-size: 13px; color: #c3c4b5; }
+.objective { font-size: 9px; letter-spacing: 2px; color: #878c76; margin: 13px 0 29px; }
+#start { min-width: 220px; border: 1px solid #af4236; padding: 17px 22px; background: #8c3028; color: #efe7da; font-size: 12px; letter-spacing: 2px; text-align: left; box-shadow: 0 5px 30px #0006; }
+#start span { float: right; }
+#start:hover { background: #a33b30; }
+.screen-note { font-size: 8px; letter-spacing: 1.3px; color: #7c8170; margin-top: 18px; }
+.corner { position: absolute; width: 20px; height: 20px; opacity: .6; border-color: #a4aa8c; border-style: solid; }
+.top-left { top: 23px; left: 23px; border-width: 1px 0 0 1px; }
+.bottom-right { bottom: 23px; right: 23px; border-width: 0 1px 1px 0; }
+.recording { position: absolute; bottom: 26px; left: 26px; font-size: 9px; letter-spacing: 2px; color: #969b85; }
+.recording i { background: #a74638; width: 4px; height: 4px; }
+/* ── HUD ────────────────────────────────────────────────────────────────── */
+.hud { position: absolute; inset: 0; padding: 20px 28px; pointer-events: none; font-size: 12px; letter-spacing: 1.5px; text-shadow: 0 2px 4px #000, 0 0 8px #0008; z-index: 5; }
+.hud-top, .hud-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.hud-top { position: absolute; left: 28px; right: 28px; top: 20px; }
+.hud-bottom { position: absolute; left: 28px; right: 28px; bottom: 20px; }
+#exit-status { color: #bb7261; }
+#exit-status.unlocked { color: #b8c99b; }
+.crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #dcdac099; font-size: 16px; }
+/* ── MESSAGE ────────────────────────────────────────────────────────────── */
+.message { position: absolute; bottom: 13%; left: 12px; right: 12px; text-align: center; z-index: 6; color: #d6cfbb; font-size: 13px; letter-spacing: 2.5px; text-shadow: 0 2px 8px #000, 0 0 20px #0009; opacity: 0; transition: opacity .35s; pointer-events: none; }
+.message.visible { opacity: 1; }
+/* ── MONSTER PROXIMITY EFFECTS ──────────────────────────────────────────── */
+.danger::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; box-shadow: inset 0 0 120px #8b161cbb; animation: pulseRed 1.4s ease-in-out infinite; }
+.imminent::after { animation: pulseRed .4s ease-in-out infinite !important; }
+@keyframes pulseRed { 0%,100% { opacity:.7; box-shadow:inset 0 0 120px #8b161cbb; } 50% { opacity:1; box-shadow:inset 0 0 220px #c01020ee; } }
+/* ── SHAKE / FLICKER ────────────────────────────────────────────────────── */
+.shake canvas { animation: shake .1s infinite; }
+.flicker canvas { animation: flicker .15s steps(2) 3; }
+.monster-flicker canvas { animation: monsterFlicker .09s steps(1) infinite; }
+@keyframes shake { 0% { transform:translate(2px,1px) rotate(.3deg); } 25% { transform:translate(-2px,-1px) rotate(-.2deg); } 50% { transform:translate(-1px,2px) rotate(.1deg); } 75% { transform:translate(2px,-1px) rotate(-.3deg); } 100% { transform:translate(1px,1px) rotate(.2deg); } }
+@keyframes flicker { 50% { opacity:.5; } }
+@keyframes monsterFlicker { 0%{opacity:1;} 33%{opacity:.55;} 66%{opacity:.85;} 100%{opacity:1;} }
+/* ── SPEED FLASH ────────────────────────────────────────────────────────── */
+.speed-flash { animation: speedFlash .6s ease-out; }
+@keyframes speedFlash { 0%{filter:brightness(4) saturate(0) hue-rotate(0deg);} 40%{filter:brightness(1.5) saturate(3) hue-rotate(-20deg);} 100%{filter:brightness(1) saturate(1);} }
+/* ── FOOTER OVERLAY ─────────────────────────────────────────────────────── */
+.footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: linear-gradient(to top, #000b, transparent); pointer-events: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px; font-size: 9px; color: #606560; pointer-events: none; }
+.controls > span { display: flex; align-items: center; gap: 5px; }
+kbd { border: 1px solid #333; padding: 3px 5px; font: inherit; color: #777; min-width: 9px; text-align: center; font-size: 8px; }
+#sound { border: 0; background: none; color: #777; font-size: 9px; padding: 8px 12px; white-space: nowrap; pointer-events: all; letter-spacing: 1px; }
+#sound:hover { color: #bbb; }
+/* ── TOUCH CONTROLS ─────────────────────────────────────────────────────── */
+.touch-controls { display: none; position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%); z-index: 10; gap: 10px; justify-content: center; }
+.touch-controls button { touch-action: none; user-select: none; width: 52px; height: 48px; border: 1px solid #474c3a; background: #20241bcc; color: #dbdccb; font-size: 22px; }
+@media (pointer: coarse) { .touch-controls { display: flex; } }
+/* ── MISC ────────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.shell, .masthead, .caption { display: none; }
+@media (max-width: 700px) {
+  .hud { font-size: 9px; padding: 12px 14px; }
+  .hud-top { top: 12px; left: 14px; right: 14px; }
+  .hud-bottom { bottom: 12px; left: 14px; right: 14px; }
+  .message { font-size: 10px; letter-spacing: 1px; }
+  h1 { font-size: clamp(42px, 12vw, 80px); }
+  .eyebrow { font-size: 7px; }
+  #start { padding: 13px 18px; min-width: 190px; font-size: 10px; }
+  .recording { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .shake canvas,.flicker canvas,.monster-flicker canvas { animation: none; } .message { transition: none; } .danger::after,.imminent::after { animation: none; } }

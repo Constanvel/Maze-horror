@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>THE HALLWAY - Find the exit.</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <section class="game" id="game" aria-label="First-person horror maze">
+    <canvas id="canvas" width="320" height="180" aria-label="Maze view."></canvas>
+    <div class="crt" aria-hidden="true"></div>
+    <div class="hud hidden" id="hud">
+      <div class="hud-top"><span id="keys">KEYS: 0 / 3</span><span id="exit-status">EXIT LOCKED</span></div>
+      <span class="crosshair" aria-hidden="true">+</span>
+      <div class="hud-bottom"><span id="battery">BATTERY: 100%</span><span id="light-status">LIGHT ON</span></div>
+    </div>
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+    <div class="screen" id="screen">
+      <div class="screen-inner">
+        <p class="eyebrow" id="eyebrow">AN ATMOSPHERIC HORROR EXPERIENCE</p>
+        <h1 id="title">THE<br>HALLWAY<span class="title-dot">.</span></h1>
+        <p class="tagline" id="tagline">Find the exit. Don't let it find you.</p>
+        <p class="objective" id="objective">THREE KEYS. ONE WAY OUT.</p>
+        <button id="start" type="button">START GAME <span aria-hidden="true">&#x2197;</span></button>
+        <p class="screen-note" id="screen-note">HEADPHONES RECOMMENDED &middot; KEEP MOVING</p>
+      </div>
+      <span class="corner top-left" aria-hidden="true"></span>
+      <span class="corner bottom-right" aria-hidden="true"></span>
+      <span class="recording" aria-hidden="true">REC <i></i> &nbsp; CAM_01</span>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="controls">
+      <span><kbd>W</kbd><kbd>S</kbd> MOVE</span>
+      <span><kbd>A</kbd><kbd>D</kbd> TURN</span>
+      <span><kbd>F</kbd> FLASHLIGHT</span>
+      <span><kbd>ESC</kbd> PAUSE</span>
+    </div>
+    <button id="sound" type="button" aria-pressed="false">SOUND: OFF</button>
+  </footer>
+  <div class="touch-controls" aria-label="Touch controls">
+    <button data-key="a" aria-label="Turn left">&#x21B6;</button>
+    <button data-key="w" aria-label="Move forward">&#x2191;</button>
+    <button data-key="s" aria-label="Move backward">&#x2193;</button>
+    <button data-key="d" aria-label="Turn right">&#x21B7;</button>
+    <button data-key="f" aria-label="Toggle flashlight">F</button>
+  </div>
+  <noscript>This game needs JavaScript enabled.</noscript>
+</body>
+</html>
