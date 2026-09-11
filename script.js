@@ -778,9 +778,37 @@ function updateMonster(now,dt){
     // Normalisasi vektor (direction vector) lalu kali speed
     var nx=monster.x+(dx/dist)*monster.speed;  // Posisi X baru
     var ny=monster.y+(dy/dist)*monster.speed;  // Posisi Y baru
-    // Axis-separated collision (sama seperti player)
-    if(!isWall(nx,monster.y))monster.x=nx;    // Coba gerak horizontal
-    if(!isWall(monster.x,ny))monster.y=ny;    // Coba gerak vertical
+    
+    // Cek apakah posisi baru bebas dari dinding
+    var canMoveX=!isWall(nx,monster.y);
+    var canMoveY=!isWall(monster.x,ny);
+    var canMoveDiagonal=!isWall(nx,ny);
+    
+    // Strategi: coba gerak diagonal dulu, kalau nabrak coba axis-separated, kalau masih nabrak coba slide
+    if(canMoveDiagonal&&canMoveX&&canMoveY){
+      // Bisa gerak diagonal langsung
+      monster.x=nx;
+      monster.y=ny;
+    }else if(canMoveX||canMoveY){
+      // Salah satu axis terbuka → axis-separated movement
+      if(canMoveX)monster.x=nx;
+      if(canMoveY)monster.y=ny;
+    }else{
+      // Kedua axis terblokir → coba slide di sepanjang dinding (pathfinding sederhana)
+      // Coba gerak perpendicular ke arah player
+      var perpX=-dy/dist*monster.speed;  // Perpendicular vector
+      var perpY=dx/dist*monster.speed;
+      
+      // Coba slide ke kanan dinding
+      if(!isWall(monster.x+perpX,monster.y+perpY)){
+        monster.x+=perpX;
+        monster.y+=perpY;
+      }else if(!isWall(monster.x-perpX,monster.y-perpY)){
+        // Coba slide ke kiri dinding
+        monster.x-=perpX;
+        monster.y-=perpY;
+      }
+    }
   }
 
   // --- Suara langkah monster (semakin dekat, interval makin pendek) ---

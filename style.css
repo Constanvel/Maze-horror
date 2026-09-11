@@ -95,6 +95,7 @@ canvas {
      #070908 = hijau gelap sangat pekat, 95/69/45 = alpha (hex) */
   background: linear-gradient(90deg, #07090895, #07090845, #07090895);
   z-index: 4;            /* Di atas CRT overlay (z-index:3) */
+  pointer-events: all;   /* Aktifkan pointer events agar tombol bisa diklik */
 }
 
 .screen-inner { padding: 24px; } /* Padding di dalam screen */
