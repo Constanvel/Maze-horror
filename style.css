@@ -1,89 +1,548 @@
-:root { color-scheme: dark; font-family: "Courier New", monospace; color: #cccbbf; background: #000; }
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-button, a { -webkit-tap-highlight-color: transparent; }
-button { font: inherit; cursor: pointer; }
-button:focus-visible, a:focus-visible { outline: 2px solid #e6dfbf; outline-offset: 5px; }
-/* ── FULL-SCREEN GAME ───────────────────────────────────────────────────── */
-#game { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-.wordmark { color: #dddcd0; text-decoration: none; font-weight: bold; font-size: 14px; }
-.wordmark span { color: #777a6d; font-size: 10px; font-weight: normal; }
-.signal { color: #939c7e; font-size: 10px; }
-i { display: inline-block; width: 5px; height: 5px; background: #929b75; margin-right: 7px; }
-.crt { position: absolute; inset: 0; pointer-events: none; z-index: 3; opacity: .22; background: repeating-linear-gradient(0deg, #0006 0 1px, transparent 1px 3px); box-shadow: inset 0 0 120px #000a; }
-.screen { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: linear-gradient(90deg, #07090895, #07090845, #07090895); z-index: 4; }
-.screen-inner { padding: 24px; }
-.eyebrow { color: #5a5f50; font-size: 8px; letter-spacing: 3px; margin: 0 0 18px; }
-h1 { margin: 0; color: #cac9bc; font-family: Impact, "Arial Narrow", sans-serif; font-size: clamp(52px, 9vw, 120px); line-height: .88; font-weight: 900; letter-spacing: 4px; text-shadow: 0 4px 32px #000; }
-.title-dot { color: #8c3028; }
-.tagline { margin: 20px 0 0; font-size: 11px; color: #7a7b6e; letter-spacing: 1px; }
-.objective { font-size: 8px; letter-spacing: 2px; color: #555850; margin: 10px 0 26px; }
-#start { min-width: 180px; border: 1px solid #6b2820; padding: 15px 20px; background: #5a1e18; color: #c8c0b5; font-size: 11px; letter-spacing: 2px; text-align: left; box-shadow: 0 4px 24px #0008; }
-#start span { float: right; }
-#start:hover { background: #7a2820; }
-.screen-note { font-size: 7px; letter-spacing: 1.5px; color: #464840; margin-top: 14px; }
-.corner { position: absolute; width: 20px; height: 20px; opacity: .6; border-color: #a4aa8c; border-style: solid; }
-.top-left { top: 23px; left: 23px; border-width: 1px 0 0 1px; }
-.bottom-right { bottom: 23px; right: 23px; border-width: 0 1px 1px 0; }
-.recording { position: absolute; bottom: 26px; left: 26px; font-size: 9px; letter-spacing: 2px; color: #969b85; }
-.recording i { background: #a74638; width: 4px; height: 4px; }
-/* ── HUD ────────────────────────────────────────────────────────────────── */
-.hud { position: absolute; inset: 0; padding: 20px 24px; pointer-events: none; z-index: 5; }
-.hud-top, .hud-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.hud-top { position: absolute; left: 24px; right: 24px; top: 18px; }
-.hud-bottom { position: absolute; left: 24px; right: 24px; bottom: 18px; }
-/* Timer countdown — tiny, top-left; turns red + pulses last 10s */
-.hud-keys { font-size: 11px; letter-spacing: 2px; color: #8a8870; opacity: 0.75; text-shadow: 0 1px 4px #000; font-family: monospace; }
-.hud-keys.timer-danger { color: #cc2222; opacity: 1; animation: timerPulse 0.6s ease-in-out infinite; }
-/* Exit label — only appears when unlocked, green */
-.hud-exit { font-size: 9px; letter-spacing: 2px; color: #7ea870; text-shadow: 0 1px 6px #000; }
-/* Battery — monospace block chars, very dim */
-.hud-battery { font-size: 9px; letter-spacing: 1px; color: #666; opacity: 0.6; font-family: monospace; text-shadow: none; }
-/* No-light warning */
-.hud-light { font-size: 8px; letter-spacing: 2px; color: #7a4040; opacity: 0.8; }
-#exit-status { color: #7ea870; }
-.crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffffff18; font-size: 14px; }
-/* ── MESSAGE ────────────────────────────────────────────────────────────── */
-.message { position: absolute; bottom: 11%; left: 10%; right: 10%; text-align: center; z-index: 6; color: #a09888; font-size: 10px; letter-spacing: 3px; text-shadow: 0 1px 6px #000; opacity: 0; transition: opacity .5s; pointer-events: none; }
-.message.visible { opacity: 1; }
-/* ── MONSTER PROXIMITY EFFECTS ──────────────────────────────────────────── */
-.danger::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; box-shadow: inset 0 0 120px #8b161cbb; animation: pulseRed 1.4s ease-in-out infinite; }
-.imminent::after { animation: pulseRed .4s ease-in-out infinite !important; }
-@keyframes timerPulse { 0%,100% { opacity:1; text-shadow:0 0 8px #cc2222; } 50% { opacity:0.5; text-shadow:0 0 20px #ff0000; } }
-@keyframes pulseRed { 0%,100% { opacity:.7; box-shadow:inset 0 0 120px #8b161cbb; } 50% { opacity:1; box-shadow:inset 0 0 220px #c01020ee; } }
-/* ── SHAKE / FLICKER ────────────────────────────────────────────────────── */
-.shake canvas { animation: shake .1s infinite; }
-.flicker canvas { animation: flicker .15s steps(2) 3; }
-.monster-flicker canvas { animation: monsterFlicker .09s steps(1) infinite; }
-@keyframes shake { 0% { transform:translate(2px,1px) rotate(.3deg); } 25% { transform:translate(-2px,-1px) rotate(-.2deg); } 50% { transform:translate(-1px,2px) rotate(.1deg); } 75% { transform:translate(2px,-1px) rotate(-.3deg); } 100% { transform:translate(1px,1px) rotate(.2deg); } }
-@keyframes flicker { 50% { opacity:.5; } }
-@keyframes monsterFlicker { 0%{opacity:1;} 33%{opacity:.55;} 66%{opacity:.85;} 100%{opacity:1;} }
-/* ── SPEED FLASH ────────────────────────────────────────────────────────── */
-.speed-flash { animation: speedFlash .6s ease-out; }
-@keyframes speedFlash { 0%{filter:brightness(4) saturate(0) hue-rotate(0deg);} 40%{filter:brightness(1.5) saturate(3) hue-rotate(-20deg);} 100%{filter:brightness(1) saturate(1);} }
-/* ── FOOTER OVERLAY ─────────────────────────────────────────────────────── */
-.footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: linear-gradient(to top, #000b, transparent); pointer-events: none; }
-.controls { display: flex; flex-wrap: wrap; gap: 16px; font-size: 9px; color: #606560; pointer-events: none; }
-.controls > span { display: flex; align-items: center; gap: 5px; }
-kbd { border: 1px solid #333; padding: 3px 5px; font: inherit; color: #777; min-width: 9px; text-align: center; font-size: 8px; }
-#sound { border: 0; background: none; color: #777; font-size: 9px; padding: 8px 12px; white-space: nowrap; pointer-events: all; letter-spacing: 1px; }
-#sound:hover { color: #bbb; }
-/* ── TOUCH CONTROLS ─────────────────────────────────────────────────────── */
-.touch-controls { display: none; position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%); z-index: 10; gap: 10px; justify-content: center; }
-.touch-controls button { touch-action: none; user-select: none; width: 52px; height: 48px; border: 1px solid #474c3a; background: #20241bcc; color: #dbdccb; font-size: 22px; }
-@media (pointer: coarse) { .touch-controls { display: flex; } }
-/* ── MISC ────────────────────────────────────────────────────────────────── */
-.hidden { display: none !important; }
-.shell, .masthead, .caption { display: none; }
-@media (max-width: 700px) {
-  .hud { font-size: 9px; padding: 12px 14px; }
-  .hud-top { top: 12px; left: 14px; right: 14px; }
-  .hud-bottom { bottom: 12px; left: 14px; right: 14px; }
-  .message { font-size: 10px; letter-spacing: 1px; }
-  h1 { font-size: clamp(42px, 12vw, 80px); }
-  .eyebrow { font-size: 7px; }
-  #start { padding: 13px 18px; min-width: 190px; font-size: 10px; }
-  .recording { display: none; }
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ROOT & RESET — Variabel global dan reset dasar browser                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;                    /* Beritahu browser: ini dark mode (affects scrollbars, inputs) */
+  font-family: "Courier New", monospace; /* Font monospace — kesan retro/terminal */
+  color: #cccbbf;                        /* Warna teks default: abu kekuningan */
+  background: #000;                      /* Background body: hitam total */
 }
-@media (prefers-reduced-motion: reduce) { .shake canvas,.flicker canvas,.monster-flicker canvas { animation: none; } .message { transition: none; } .danger::after,.imminent::after { animation: none; } }
+
+* { box-sizing: border-box; }
+/* Semua elemen gunakan border-box: padding + border termasuk dalam width/height
+   Contoh: width:100px + padding:10px = tetap 100px total (bukan 120px) */
+
+html, body {
+  margin: 0;            /* Hapus margin default browser */
+  padding: 0;           /* Hapus padding default */
+  width: 100%;          /* Lebar penuh viewport */
+  height: 100%;         /* Tinggi penuh viewport */
+  overflow: hidden;     /* Sembunyikan scrollbar — game tidak boleh di-scroll */
+  background: #000;     /* Background hitam di luar game */
+}
+
+/* Reset untuk button dan link */
+button, a { -webkit-tap-highlight-color: transparent; }
+/* Hapus highlight biru/oranye saat tap di iOS/Safari mobile */
+
+button { font: inherit; cursor: pointer; }
+/* Button warisi font dari parent, tampilan kursor tangan */
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #e6dfbf;  /* Outline kuning pucat saat navigasi keyboard (Tab) */
+  outline-offset: 5px;          /* Jarak outline dari elemen */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* GAME SECTION — Container utama game (fixed fullscreen)                   */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+#game {
+  position: fixed;       /* Fixed position: tetap di tempat meski page di-scroll */
+  inset: 0;              /* shorthand: top:0; right:0; bottom:0; left:0 — penuh layar */
+  width: 100vw;          /* Lebar = 100% viewport width */
+  height: 100vh;         /* Tinggi = 100% viewport height */
+  overflow: hidden;      /* Sembunyikan overflow */
+  background: #000;      /* Background hitam */
+}
+
+canvas {
+  display: block;        /* Hapus spasi bawah default canvas (inline element) */
+  width: 100%;           /* Stretch canvas CSS ke lebar penuh (resolusi asli 320px di-scale) */
+  height: 100%;          /* Stretch ke tinggi penuh */
+  image-rendering: pixelated;
+  /* Saat di-scale, gunakan nearest-neighbor → tepi pixel tajam (efek retro)
+     Alternatif: crisp-edges, -moz-crisp-edges */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* CRT OVERLAY — Efek scanline TV CRT lama                                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.crt {
+  position: absolute;    /* Posisi relatif terhadap #game */
+  inset: 0;              /* Penuh layar */
+  pointer-events: none;  /* Tidak menangkap mouse/touch events (tembus klik) */
+  z-index: 3;            /* Di atas canvas tapi di bawah HUD/screen */
+  opacity: .22;          /* 22% opacity — efek halus, tidak mengganggu */
+
+  /* Scanline pattern: garis horizontal gelap berulang tiap 3px */
+  background: repeating-linear-gradient(
+    0deg,                /* Arah gradient: vertikal (ke bawah) */
+    #0006 0 1px,         /* 1px garis hitam semi-transparan (#0006 = #000000 alpha 38%) */
+    transparent 1px 3px  /* 2px transparan (jarak antar garis) */
+  );
+
+  /* Vignette: gelap di tepi layar (bayangan dalam) */
+  box-shadow: inset 0 0 120px #000a; /* inset = shadow dalam, 120px blur, hitam 67% opacity */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* TITLE / END SCREEN — Overlay untuk menu awal dan akhir game             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.screen {
+  position: absolute;    /* Posisi relatif terhadap #game */
+  inset: 0;              /* Penuh layar */
+  display: grid;         /* CSS Grid layout */
+  place-items: center;   /* Pusatkan konten secara horizontal + vertical */
+  text-align: center;    /* Teks rata tengah */
+
+  /* Background gradient: gelap di kiri-kanan, sedikit lebih terang di tengah
+     #070908 = hijau gelap sangat pekat, 95/69/45 = alpha (hex) */
+  background: linear-gradient(90deg, #07090895, #07090845, #07090895);
+  z-index: 4;            /* Di atas CRT overlay (z-index:3) */
+}
+
+.screen-inner { padding: 24px; } /* Padding di dalam screen */
+
+/* Label kecil di atas judul ("SURVIVAL HORROR") */
+.eyebrow {
+  color: #5a5f50;        /* Hijau pudar */
+  font-size: 8px;        /* Sangat kecil */
+  letter-spacing: 3px;   /* Spasi antar huruf lebar (kesan cinematic) */
+  margin: 0 0 18px;      /* Margin atas=0, bawah=18px */
+}
+
+/* Judul utama: "THE HALLWAY" */
+h1 {
+  margin: 0;             /* Hapus margin default h1 */
+  color: #cac9bc;        /* Abu kekuningan pucat */
+  font-family: Impact, "Arial Narrow", sans-serif; /* Font Impact: tebal, dramatis */
+  font-size: clamp(52px, 9vw, 120px);
+  /* Responsive font: min 52px, ideal 9vw, max 120px.
+     vw = viewport width → menyesuaikan layar */
+  line-height: .88;      /* Baris rapat (tinggi baris 88% dari font-size) */
+  font-weight: 900;      /* Tebal penuh */
+  letter-spacing: 4px;   /* Spasi huruf lebar */
+  text-shadow: 0 4px 32px #000; /* Bayangan teks: 4px ke bawah, 32px blur, hitam */
+}
+
+/* Titik merah di akhir judul: "HALLWAY." */
+.title-dot { color: #8c3028; } /* Merah gelap — kesan darah/menyeramkan */
+
+/* Subtitle: "Survive 60 seconds. Then run." */
+.tagline {
+  margin: 20px 0 0;     /* 20px atas, 0 sisanya */
+  font-size: 11px;
+  color: #7a7b6e;        /* Abu-hijau pudar */
+  letter-spacing: 1px;
+}
+
+/* Instruksi: "SURVIVE. FIND THE DOOR. ESCAPE." */
+.objective {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #555850;        /* Sangat pudar — secondary info */
+  margin: 10px 0 26px;   /* 10px atas, 26px bawah */
+}
+
+/* Tombol "ENTER ↗" */
+#start {
+  min-width: 180px;      /* Lebar minimum */
+  border: 1px solid #6b2820; /* Border coklat gelap kemerahan */
+  padding: 15px 20px;    /* Padding dalam tombol */
+  background: #5a1e18;   /* Background merah sangat gelap */
+  color: #c8c0b5;        /* Teks putih kecoklatan */
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-align: left;      /* Teks rata kiri di dalam tombol */
+  box-shadow: 0 4px 24px #0008; /* Bayangan: 4px ke bawah, 24px blur, hitam 50% */
+}
+#start span { float: right; } /* Panah ↗ float ke kanan */
+#start:hover { background: #7a2820; } /* Hover: sedikit lebih terang */
+
+/* Catatan bawah: "HEADPHONES ON. KEEP MOVING." */
+.screen-note {
+  font-size: 7px;        /* Sangat kecil */
+  letter-spacing: 1.5px;
+  color: #464840;        /* Hampir tidak terlihat — easter egg feel */
+  margin-top: 14px;
+}
+
+/* Sudut dekoratif: garis L di pojok layar */
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: .6;           /* Semi-transparan */
+  border-color: #a4aa8c; /* Hijau keabu-abuan */
+  border-style: solid;   /* Garis tepi solid */
+}
+.top-left {
+  top: 23px; left: 23px;
+  border-width: 1px 0 0 1px; /* Hanya border atas + kiri = sudut L */
+}
+.bottom-right {
+  bottom: 23px; right: 23px;
+  border-width: 0 1px 1px 0; /* Hanya border kanan + bawah = sudut L terbalik */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* HUD (Heads-Up Display) — Informasi game di atas canvas                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  padding: 20px 24px;
+  pointer-events: none; /* Tidak menangkap klik — klik tembus ke canvas */
+  z-index: 5;           /* Di atas screen (z-index:4) */
+}
+
+.hud-top, .hud-bottom {
+  display: flex;                  /* Flexbox: susun item horizontal */
+  justify-content: space-between; /* Sisi kiri dan kanan */
+  align-items: center;            /* Vertically center */
+  gap: 12px;                      /* Jarak antar item */
+}
+
+.hud-top {
+  position: absolute;
+  left: 24px; right: 24px; top: 18px; /* Posisi: atas layar, inset 24px */
+}
+.hud-bottom {
+  position: absolute;
+  left: 24px; right: 24px; bottom: 18px; /* Posisi: bawah layar */
+}
+
+/* Timer countdown — pojok kiri atas */
+.hud-keys {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #8a8870;        /* Hijau keabu-abuan */
+  opacity: 0.75;         /* Sedikit transparan */
+  text-shadow: 0 1px 4px #000; /* Bayangan gelap untuk keterbacaan */
+  font-family: monospace;
+}
+/* Timer berbahaya: 10 detik terakhir → merah + berkedip */
+.hud-keys.timer-danger {
+  color: #cc2222;        /* Merah cerah */
+  opacity: 1;            /* Full opacity */
+  animation: timerPulse 0.6s ease-in-out infinite;
+  /* Animasi pulse: opacity naik-turun, berulang tanpa henti */
+}
+
+/* Label "EXIT OPEN" — hijau, hanya muncul saat pintu terbuka */
+.hud-exit {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #7ea870;        /* Hijau terang (positif = terbuka) */
+  text-shadow: 0 1px 6px #000;
+}
+
+/* Indikator baterai — monospace block chars */
+.hud-battery {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #666;           /* Abu gelap */
+  opacity: 0.6;
+  font-family: monospace; /* Monospace agar block chars aligned */
+  text-shadow: none;
+}
+
+/* Label "NO LIGHT" — merah pudar */
+.hud-light {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #7a4040;        /* Merah gelap pudar */
+  opacity: 0.8;
+}
+
+#exit-status { color: #7ea870; } /* Warna hijau untuk label exit */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* MESSAGES — Pesan in-game yang muncul sementara                         */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.message {
+  position: absolute;
+  bottom: 11%;           /* 11% dari bawah layar */
+  left: 10%; right: 10%; /* Margin 10% kiri-kanan (pesan tidak terlalu lebar) */
+  text-align: center;
+  z-index: 6;            /* Di atas HUD */
+  color: #a09888;        /* Abu kecoklatan */
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-shadow: 0 1px 6px #000;
+  opacity: 0;            /* Default: tersembunyi (invisible) */
+  transition: opacity .5s; /* Fade in/out selama 0.5 detik */
+  pointer-events: none;  /* Tidak menangkap klik */
+}
+.message.visible { opacity: 1; }
+/* Class 'visible' ditambahkan via JS → opacity 0→1 dengan transition */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* MONSTER PROXIMITY EFFECTS — Efek visual berdasarkan jarak monster       */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* .danger: monster cukup dekat (<8 satuan) — vignette merah berdenyut */
+.danger::after {
+  content: "";            /* Pseudo-element butuh content untuk muncul */
+  position: absolute;
+  inset: 0;              /* Penuh layar */
+  pointer-events: none;
+  z-index: 2;            /* Di bawah HUD tapi di atas canvas */
+  box-shadow: inset 0 0 120px #8b161cbb;
+  /* inset box-shadow: bayangan merah gelap (#8B161C) dari dalam, 120px blur, 73% opacity */
+  animation: pulseRed 1.4s ease-in-out infinite;
+  /* Animasi: opacity naik-turun per 1.4 detik */
+}
+
+/* .imminent: monster SANGAT dekat (<2.5 satuan) — pulse jauh lebih cepat */
+.imminent::after {
+  animation: pulseRed .4s ease-in-out infinite !important;
+  /* Override .danger: 0.4 detik (3.5x lebih cepat) = lebih intens */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* KEYFRAME ANIMATIONS — Definisi animasi CSS                               */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Timer Pulse: berkedip merah saat 10 detik terakhir */
+@keyframes timerPulse {
+  0%,100% { opacity:1; text-shadow:0 0 8px #cc2222; }
+  /* Awal & akhir: full opacity, glow merah kecil */
+  50% { opacity:0.5; text-shadow:0 0 20px #ff0000; }
+  /* Tengah: setengah transparan, glow merah lebih besar */
+}
+
+/* Pulse Red: vignette merah berdenyut */
+@keyframes pulseRed {
+  0%,100% { opacity:.7; box-shadow:inset 0 0 120px #8b161cbb; }
+  /* Normal: 70% opacity, shadow gelap */
+  50% { opacity:1; box-shadow:inset 0 0 220px #c01020ee; }
+  /* Peak: full opacity, shadow lebih besar (220px) + lebih terang (#C01020) + lebih opaque */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* SHAKE / FLICKER — Efek getar dan kedip layar                            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* .shake: canvas bergetar — dipicu saat monster dekat (<5 satuan) */
+.shake canvas {
+  animation: shake .1s infinite;
+  /* 0.1 detik per cycle, berulang tanpa henti = getaran cepat */
+}
+
+/* .flicker: canvas berkedip — dipicu untuk efek statis */
+.flicker canvas {
+  animation: flicker .15s steps(2) 3;
+  /* 0.15 detik, 2 langkah (on/off), 3 kali */
+}
+
+/* .monster-flicker: kedip intens — saat monster SANGAT dekat (<2.5) */
+.monster-flicker canvas {
+  animation: monsterFlicker .09s steps(1) infinite;
+  /* 0.09 detik, 1 langkah (instant), berulang = kedip cepat acak */
+}
+
+/* Definisi animasi shake: translate + rotate kecil secara acak */
+@keyframes shake {
+  0% { transform:translate(2px,1px) rotate(.3deg); }
+  25% { transform:translate(-2px,-1px) rotate(-.2deg); }
+  50% { transform:translate(-1px,2px) rotate(.1deg); }
+  75% { transform:translate(2px,-1px) rotate(-.3deg); }
+  100% { transform:translate(1px,1px) rotate(.2deg); }
+  /* Perpindahan ±2px + rotasi ±0.3° → getar halus tapi terasa */
+}
+
+/* Definisi flicker: opacity berubah di tengah */
+@keyframes flicker {
+  50% { opacity:.5; } /* Di tengah animasi: opacity turun 50% */
+}
+
+/* Definisi monsterFlicker: kedip cepat tidak beraturan */
+@keyframes monsterFlicker {
+  0% { opacity:1; }     /* Normal */
+  33% { opacity:.55; }  /* Gelap */
+  66% { opacity:.85; }  /* Sedikit terang */
+  100% { opacity:1; }   /* Normal lagi */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* SPEED FLASH — Efek flash saat momen penting (pintu terbuka, monster aktif)*/
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.speed-flash {
+  animation: speedFlash .6s ease-out;
+  /* 0.6 detik flash, ease-out = cepat lalu pelan */
+}
+
+@keyframes speedFlash {
+  0% {
+    filter:brightness(4) saturate(0) hue-rotate(0deg);
+    /* Awal: kecerahan 4x (putih terang), saturasi 0 (grayscale) */
+  }
+  40% {
+    filter:brightness(1.5) saturate(3) hue-rotate(-20deg);
+    /* 40%: masih terang, saturasi 3x (warna intens), hue shift -20° */
+  }
+  100% {
+    filter:brightness(1) saturate(1) hue-rotate(0deg);
+    /* Selesai: normal kembali */
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* FOOTER — Info kontrol + tombol sound (fixed di bawah layar)             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0; /* Penuh lebar di bawah */
+  z-index: 10;                   /* Di atas semua elemen game */
+  display: flex;
+  justify-content: space-between; /* Kontrol kiri, sound kanan */
+  align-items: center;
+  padding: 10px 20px;
+
+  /* Gradient: hitam transparan di atas → hitam solid di bawah */
+  background: linear-gradient(to top, #000b, transparent);
+
+  pointer-events: none; /* Default: tidak menangkap klik */
+}
+
+/* Info kontrol keyboard */
+.controls {
+  display: flex;
+  flex-wrap: wrap;      /* Wrap ke baris baru jika tidak cukup */
+  gap: 16px;            /* Jarak antar grup kontrol */
+  font-size: 9px;
+  color: #606560;       /* Abu gelap — tidak mencolok */
+  pointer-events: none; /* Tidak menangkap klik */
+}
+.controls > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;             /* Jarak antara tombol dan label */
+}
+
+/* Elemen <kbd>: tombol keyboard visual */
+kbd {
+  border: 1px solid #333;   /* Border gelap */
+  padding: 3px 5px;         /* Padding kecil */
+  font: inherit;             /* Warisi font dari parent */
+  color: #777;               /* Abu */
+  min-width: 9px;            /* Lebar minimum agar tidak terlalu kecil */
+  text-align: center;
+  font-size: 8px;
+}
+
+/* Tombol Sound */
+#sound {
+  border: 0;           /* Tidak ada border */
+  background: none;    /* Transparent */
+  color: #777;         /* Abu */
+  font-size: 9px;
+  padding: 8px 12px;
+  white-space: nowrap; /* Tidak wrap ke baris baru */
+  pointer-events: all; /* Aktifkan pointer events (bisa diklik) */
+  letter-spacing: 1px;
+}
+#sound:hover { color: #bbb; } /* Hover: lebih terang */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* TOUCH CONTROLS — Tombol sentuh untuk perangkat mobile                   */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.touch-controls {
+  display: none;        /* Default: tersembunyi (desktop tidak perlu) */
+  position: fixed;
+  bottom: 48px;         /* Di atas footer */
+  left: 50%;            /* Posisi horizontal tengah */
+  transform: translateX(-50%); /* Center dengan transform */
+  z-index: 10;
+  gap: 10px;
+  justify-content: center;
+}
+
+.touch-controls button {
+  touch-action: none;   /* Cegah browser handle gestures (zoom, scroll) */
+  user-select: none;    /* Cegah text selection saat tap */
+  width: 52px;
+  height: 48px;
+  border: 1px solid #474c3a; /* Border hijau gelap */
+  background: #20241bcc;     /* Background hijau-hitam semi-transparan */
+  color: #dbdccb;             /* Teks putih kehijauan */
+  font-size: 22px;            /* Ukuran ikon panah */
+}
+
+/* Media query: tampilkan touch controls HANYA untuk layar sentuh */
+@media (pointer: coarse) {
+  .touch-controls { display: flex; }
+  /* pointer: coarse = sentuh (bukan mouse). display:flex = tampilkan */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* MISC — Utilitas dan responsive                                          */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.hidden { display: none !important; }
+/* Class utility: sembunyikan elemen. !important = override semua other rules */
+
+.shell, .masthead, .caption { display: none; }
+/* Sembunyikan elemen dekoratif yang mungkin ditambahkan later */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* RESPONSIVE — Penyesuaian untuk layar kecil (<700px)                     */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 700px) {
+  .hud {
+    font-size: 9px;              /* Font lebih kecil */
+    padding: 12px 14px;          /* Padding lebih rapat */
+  }
+  .hud-top {
+    top: 12px; left: 14px; right: 14px; /* Lebih rapat ke tepi */
+  }
+  .hud-bottom {
+    bottom: 12px; left: 14px; right: 14px;
+  }
+  .message {
+    font-size: 10px;
+    letter-spacing: 1px;         /* Spasi huruf lebih rapat */
+  }
+  h1 {
+    font-size: clamp(42px, 12vw, 80px); /* Judul lebih kecil di mobile */
+  }
+  .eyebrow { font-size: 7px; }
+  #start {
+    padding: 13px 18px;
+    min-width: 190px;
+    font-size: 10px;
+  }
+  .recording { display: none; } /* Sembunyikan elemen "recording" di mobile */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ACCESSIBILITY — Preferensi aksesibilitas user                           */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Jika user OS set "reduce motion" → matikan semua animasi bergerak */
+  .shake canvas,
+  .flicker canvas,
+  .monster-flicker canvas {
+    animation: none; /* Matikan shake/flicker */
+  }
+  .message { transition: none; } /* Matikan fade in/out pesan */
+  .danger::after,
+  .imminent::after {
+    animation: none; /* Matikan pulse merah */
+  }
+}

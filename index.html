@@ -1,63 +1,133 @@
 <!DOCTYPE html>
+<!-- Deklarasi dokumen sebagai HTML5 -->
 <html lang="en">
+<!-- Bahasa dokumen: Inggris (untuk aksesibilitas screen reader) -->
 <head>
   <meta charset="UTF-8">
+  <!-- Encoding karakter: UTF-8 (mendukung semua karakter Unicode) -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Viewport: lebar = lebar device, zoom awal = 100% (penting untuk mobile) -->
   <meta name="theme-color" content="#000000">
+  <!-- Warna theme browser (Android Chrome): hitam — menyatu dengan UI game -->
   <title>THE HALLWAY</title>
+  <!-- Judul tab browser -->
   <link rel="stylesheet" href="style.css">
+  <!-- Hubungkan file CSS untuk styling -->
   <script src="script.js" defer></script>
+  <!-- Hubungkan file JavaScript. defer = jalankan setelah HTML selesai di-parse (tidak blok rendering) -->
 </head>
 <body>
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION GAME — Container utama game (fixed fullscreen via CSS)        -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <section class="game" id="game" aria-label="Horror maze">
+    <!-- Canvas: tempat rendering 3D maze (320×180 px, pixelated via CSS) -->
     <canvas id="canvas" width="320" height="180"></canvas>
-    <div class="crt" aria-hidden="true"></div>
 
-    <!-- Minimal HUD: only keys and battery bar -->
+    <!-- CRT Overlay: efek scanline TV CRT via CSS (repeating-linear-gradient) -->
+    <div class="crt" aria-hidden="true"></div>
+    <!-- aria-hidden="true" = dekoratif, screen reader abaikan -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- HUD (Heads-Up Display) — Informasi game di atas canvas            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div class="hud hidden" id="hud">
+      <!-- hidden = display:none via CSS. Dihapus saat game mulai -->
+
       <div class="hud-top">
+        <!-- Timer countdown (60 detik) — default "01:00", berubah merah saat <10s -->
         <span id="keys" class="hud-keys">01:00</span>
+
+        <!-- Label "EXIT OPEN" — muncul saat pintu keluar terbuka (setelah 60s) -->
         <span id="exit-status" class="hud-exit" style="display:none">EXIT OPEN</span>
+        <!-- style="display:none" = tersembunyi secara default -->
       </div>
+
       <div class="hud-bottom">
+        <!-- Indikator baterai flashlight — bar blocks █░ via JavaScript -->
         <span id="battery" class="hud-battery"></span>
+
+        <!-- Label "NO LIGHT" — muncul saat baterai habis atau light dimatikan -->
         <span id="light-status" class="hud-light" style="display:none">NO LIGHT</span>
       </div>
     </div>
-    <p class="message" id="message" role="status" aria-live="polite"></p>
 
-    <!-- Title / End screen -->
+    <!-- Pesan in-game (misal "EXIT OPEN") — fade in/out via class 'visible' -->
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+    <!-- role="status" + aria-live="polite" = screen reader announce saat berubah -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TITLE SCREEN / END SCREEN — Overlay di atas canvas                -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div class="screen" id="screen">
+      <!-- Overlay transparan dengan gradient gelap, menampilkan konten tengah -->
       <div class="screen-inner">
+        <!-- Label kecil di atas judul: "SURVIVAL HORROR" / "YOU SURVIVED" / "GAME OVER" -->
         <p class="eyebrow" id="eyebrow">SURVIVAL HORROR</p>
+
+        <!-- Judul utama: "THE HALLWAY" dengan dot merah. InnerHTML diubah via JS -->
         <h1 id="title">THE<br>HALLWAY<span class="title-dot">.</span></h1>
+        <!-- <br> = line break, .title-dot = dot merah di CSS -->
+
+        <!-- Subtitle: "Survive 60 seconds. Then run." -->
         <p class="tagline" id="tagline">Survive 60 seconds. Then run.</p>
+
+        <!-- Instruksi: "SURVIVE. FIND THE DOOR. ESCAPE." -->
         <p class="objective" id="objective">SURVIVE. FIND THE DOOR. ESCAPE.</p>
+
+        <!-- Tombol mulai game: "ENTER ↗" -->
         <button id="start" type="button">ENTER <span aria-hidden="true">&#x2197;</span></button>
+        <!-- &#x2197; = ↗ (panah kanan atas), aria-hidden = dekoratif -->
+
+        <!-- Catatan bawah: "HEADPHONES ON. KEEP MOVING." -->
         <p class="screen-note" id="screen-note">HEADPHONES ON. KEEP MOVING.</p>
       </div>
+
+      <!-- Sudut dekoratif: garis L di pojok kiri atas -->
       <span class="corner top-left" aria-hidden="true"></span>
+      <!-- Sudut dekoratif: garis L di pojok kanan bawah -->
       <span class="corner bottom-right" aria-hidden="true"></span>
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER — Info kontrol keyboard + tombol sound (fixed di bawah)       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="controls">
+      <!-- Baris 1: tombol W dan S (maj/mundur) -->
       <span><kbd>W</kbd><kbd>S</kbd></span>
+      <!-- Baris 2: tombol A dan D (putar kiri/kanan) -->
       <span><kbd>A</kbd><kbd>D</kbd></span>
+      <!-- Baris 3: tombol F (flashlight on/off) -->
       <span><kbd>F</kbd> light</span>
+      <!-- Baris 4: tombol ESC (pause) -->
       <span><kbd>ESC</kbd> pause</span>
     </div>
+
+    <!-- Tombol toggle suara: "SOUND: OFF" / "SOUND: ON" -->
     <button id="sound" type="button" aria-pressed="false">SOUND: OFF</button>
+    <!-- aria-pressed = status toggle untuk aksesibilitas -->
   </footer>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TOUCH CONTROLS — Tombol sentuh untuk mobile (muncul via CSS media)  -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <div class="touch-controls" aria-label="Touch controls">
+    <!-- data-key = karakter yang dikirim ke keyboard handler saat ditekan -->
     <button data-key="a" aria-label="Turn left">&#x21B6;</button>
+    <!-- &#x21B6; = ↶ (panah putar kiri) -->
     <button data-key="w" aria-label="Forward">&#x2191;</button>
+    <!-- &#x2191; = ↑ (panah atas) -->
     <button data-key="s" aria-label="Back">&#x2193;</button>
+    <!-- &#x2193; = ↓ (panah bawah) -->
     <button data-key="d" aria-label="Turn right">&#x21B7;</button>
+    <!-- &#x21B7; = ↷ (panah putar kanan) -->
     <button data-key="f" aria-label="Light">F</button>
+    <!-- Tombol F = toggle flashlight -->
   </div>
+
+  <!-- Fallback jika JavaScript dinonaktifkan -->
   <noscript>Enable JavaScript to play.</noscript>
 </body>
 </html>
